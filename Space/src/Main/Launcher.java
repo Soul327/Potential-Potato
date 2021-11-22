@@ -12,6 +12,7 @@ public class Launcher implements SimpleWindowEvent {
 	
 	//Main class starts the function and creates a new object instance of Launcher
 	public static void main(String[] args) {
+		System.out.println("Nightly Build Test");
 //		new Launcher();
 		
 	}
