@@ -8,12 +8,14 @@ import Rendering.Graphics;
 
 public class Launcher implements SimpleWindowEvent {
 	//Set up the window
-	SimpleWindow window;
+	static SimpleWindow window;
+	
+	//Creates states
+	TestState testState;
 	
 	//Main class starts the function and creates a new object instance of Launcher
 	public static void main(String[] args) {
-		System.out.println("Nightly Build Test");
-//		new Launcher();
+		new Launcher();
 		
 	}
 	
@@ -24,6 +26,7 @@ public class Launcher implements SimpleWindowEvent {
 		// This add this instance of Launcher to the list, allowing for the window to respond to the tar(Graphics g) function
 		window.addSimpleWindowEvent(this);
 		window.start();
+		testState = new TestState();
 	}
 	
 	// Stored number for the current state, some examples state are main menu, settings, game window, and map
@@ -35,6 +38,7 @@ public class Launcher implements SimpleWindowEvent {
 	public void tar(Graphics g) {
 		// This will choose the correct case compairing against currentStateNumber
 		switch(currentStateNumber) {
+			case 0: testState.tar(g); break;
 			default:
 				// String are drawn using their bottom left corner, therefore in order to draw on top left of screen
 				g.drawOutlinedString("Missing window state", 5, g.fontSize);
