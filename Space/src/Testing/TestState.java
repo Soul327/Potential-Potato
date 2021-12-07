@@ -1,4 +1,4 @@
-package Main;
+package Testing;
 
 import Rendering.Graphics;
 import java.awt.event.KeyEvent;
@@ -6,6 +6,7 @@ import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
+import Main.Launcher;
 import Misc.KeyManager;
 import Misc.Mat;
 import Misc.MatrixManipulation;
@@ -20,7 +21,6 @@ public class TestState {
 			this.y = y;
 		}
 	}
-	
 	
 	BufferedImage img;
 	double randA = 10;// Variation amount of each pixel, each pixel will vary in rgb color by this amount in the positive and negitive direction
