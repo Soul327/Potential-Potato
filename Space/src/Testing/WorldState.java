@@ -6,6 +6,7 @@ import java.awt.event.KeyEvent;
 
 import Main.Launcher;
 import Misc.KeyManager;
+import Misc.Mat;
 import Rendering.Graphics;
 
 public class WorldState {
@@ -13,7 +14,7 @@ public class WorldState {
 	
 	int cameraX = 0, cameraY = 0;
 	int offsetX = 1, offsetY = 0;
-	int renderLimit = 16+1;
+	int renderLimit = 4+1;
 	Tile[][] loadedTiles;
 	
 	public WorldState() {
@@ -89,15 +90,12 @@ public class WorldState {
 				loadedTiles[x][y] = null;
 				try {
 					if(x+offsetX < 0) {
-						loadedTiles[x][y] = globalTiles[globalTiles.length+offsetX][y+offsetY];
+						int lx = globalTiles.length- 1;
+						loadedTiles[x][y] = globalTiles[lx][y+offsetY];
 						continue;
 					}
 					if(y+offsetY < 0) continue;
 					if(x+offsetX >= globalTiles.length) {
-////						int z = globalTiles.length-(x+offsetX);
-//						int z = -((globalTiles.length-(offsetX+renderLimit/2)) - x + 2);
-////						System.out.printf("%d%n", z);
-//						loadedTiles[x][y] = globalTiles[z][y+offsetY];
 						continue;
 					}
 					if(y+offsetY >= globalTiles[x].length) continue;
