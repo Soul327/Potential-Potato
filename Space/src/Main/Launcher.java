@@ -13,6 +13,7 @@ public class Launcher implements SimpleWindowEvent {
 	//Creates states
 	TestState testState;
 	World world;
+	SolarSystem system;
 	
 	//Main class starts the function and creates a new object instance of Launcher
 	public static void main(String[] args) {
@@ -28,10 +29,11 @@ public class Launcher implements SimpleWindowEvent {
 		window.addSimpleWindowEvent(this);
 		window.start();
 		world = new World();
+		system = new SolarSystem();
 	}
 	
 	// Stored number for the current state, some examples state are main menu, settings, game window, and map
-	int currentStateNumber = 0;
+	int currentStateNumber = 1;
 	
 	// tar(Graphics g) stands for tick and render
 	// This will render the graphics to the screen and handle all processing
@@ -40,6 +42,7 @@ public class Launcher implements SimpleWindowEvent {
 		// This will choose the correct case compairing against currentStateNumber
 		switch(currentStateNumber) {
 			case 0: world.tar(g); break;
+			case 1: system.tar(g); break;
 			default:
 				// String are drawn using their bottom left corner, therefore in order to draw on top left of screen
 				g.drawOutlinedString("Missing window state", 5, g.fontSize);

@@ -8,6 +8,12 @@ import Rendering.Graphics;
 import java.awt.event.KeyEvent;
 
 public class World {
+	double sx = 0, sy = 0;// Location is the system
+	double svx = 0, svy = 0; // Velocity in the system
+	int size = 100; // Size of the world, does not necessarily indicative the amount of tiles
+	double mass = size * 5000;
+	Color colorOfPlanetFromSpace = new Color(50,220,75);
+	
 	int camX = 0, camY = 0;
 	double tileDrawSize = 40;
 	
@@ -16,7 +22,15 @@ public class World {
 	
 	// Initializer
 	public World() {
-		int size = 100; // Size of the world, does not necessarily indicative the amount of tiles
+		init();
+	}
+	public World(int x, int y, int vx, int vy) {
+		sx = x; sy = y;
+		svx = vx; svy = vy;
+		init();
+	}
+	
+	public void init() {
 		tiles = new Tile[size*3][size];
 		for(int x=0;x<tiles.length;x++)
 			for(int y=0;y<tiles[x].length;y++)
