@@ -1,7 +1,5 @@
 package Main;
 
-import java.awt.Color;
-
 import Events.SimpleWindowEvent;
 import Misc.SimpleWindow;
 import Rendering.Graphics;

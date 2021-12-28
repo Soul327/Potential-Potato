@@ -29,19 +29,39 @@ public class World {
 	public void gameTick() {
 		for(int x=0;x<tiles.length;x++) {
 			for(int y=0;y<tiles[x].length;y++) {
+				Tile tile = tiles[x][y];
+				Tile[][] adjacentTiles = getAdjacentTiles(x,y);
+				
+				int amount = 0;
+				double sum = 0;
+				for(int lx=0;lx<adjacentTiles.length;lx++)
+					for(int ly=0;ly<adjacentTiles[lx].length;ly++)
+						if(adjacentTiles[lx][ly]!=null) {
+							sum += adjacentTiles[lx][ly].temp;
+							amount++;
+						}
+				
+				double avg = sum / amount;
+				tile.temp = avg;
 				
 			}
 		}
 	}
-//	
-//	public Tile[][] getAdjacentTiles(int lx, int ly) {
-//		Tile[][] reTiles= new Tile[3][3];
-//		reTiles[][] = getTile(x,y);
-//		return reTiles;
-//	}
+	public Tile[][] getAdjacentTiles(int lx, int ly) {
+		Tile[][] reTiles = new Tile[3][3];
+		reTiles[0][0] = getTile(lx-1,ly-1);
+		reTiles[1][0] = getTile(lx,ly-1);
+		reTiles[2][0] = getTile(lx+1,ly-1);
+		reTiles[0][1] = getTile(lx-1,ly);
+		reTiles[2][1] = getTile(lx+1,ly);
+		reTiles[0][2] = getTile(lx-1,ly+1);
+		reTiles[1][2] = getTile(lx,ly+1);
+		reTiles[2][2] = getTile(lx+1,ly+1);
+		return reTiles;
+	}
 	Tile getTile(int x, int y) {
 		try {
-			if(x>0 && y>0 && x<tiles.length && y<tiles.length)
+			if(x>0 && y>0 && x<tiles.length-1 && y<tiles[x].length-1)
 				return tiles[x][y];
 		} catch(Exception e) {
 			e.printStackTrace();
