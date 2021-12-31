@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.util.ArrayList;
 
 import Misc.KeyManager;
+import Misc.MouseManager;
 import Rendering.Graphics;
 import java.awt.event.KeyEvent;
 
@@ -37,6 +38,12 @@ public class World {
 				tiles[x][y] = new Tile(x,y);
 		
 		entities = new ArrayList<Entity>();
+		for(int z=0;z<10;z++) {
+			Entity friend = new Slave();
+			friend.xPos = Math.random() * tiles.length;
+			friend.yPos = Math.random() * tiles[0].length;
+			entities.add(friend);
+		}
 	}
 	
 	// This tick will update everything on the word
@@ -47,6 +54,9 @@ public class World {
 				Tile tile = tiles[x][y];
 				tickTemp( tile );
 			}
+		}
+		for (int x=0; x<entities.size(); x++) {
+			entities.get(x).gameTick();
 		}
 	}
 	
@@ -92,8 +102,12 @@ public class World {
 		return null;
 	}
 
+	static double mouseOnTileX = 0, mouseOnTileY = 0;
+
 	// tar, tick and render
 	public void tar(Graphics g) {
+		mouseOnTileX = (MouseManager.mouseX-camX)/tileDrawSize;
+		mouseOnTileY = (MouseManager.mouseY-camY)/tileDrawSize;
 		// Controls
 		// getKey returns true only when pressed
 		if(KeyManager.getKey(KeyEvent.VK_W)) camY++;
@@ -105,10 +119,11 @@ public class World {
 		if(KeyManager.getKey(KeyEvent.VK_Q) && tileDrawSize > 5) tileDrawSize-= .1;
 		
 		// keyRelease return true only when the key is let go after being pressed, good for typing
-		if(KeyManager.keyRelease(KeyEvent.VK_SPACE)) gameTick();
+		//if(KeyManager.keyRelease(KeyEvent.VK_SPACE)) gameTick();
+		if(KeyManager.getKey(KeyEvent.VK_SPACE)) gameTick();
 		
 		// Rendering tiles
-		g.setColor( new Color(255,255,255) ); // Set draw color to white
+		g.setColor( new Color(55,55,55) ); // Set draw color to white
 		for(int x=0;x<tiles.length;x++)
 			for(int y=0;y<tiles[x].length;y++) {
 				// Create and set draw locations for later use
@@ -122,7 +137,21 @@ public class World {
 				// Draw rectangle of the tile
 				g.drawRect(dx, dy, tileDrawSize, tileDrawSize);
 				// Draws the temp data on the tile
-				g.drawOutlinedString( "" + (int)tiles[x][y].temp, dx+2, dy+g.fontSize);
+//				g.drawOutlinedString( "" + (int)tiles[x][y].temp, dx+2, dy+g.fontSize);
 			}
+		
+		// Rendering entities
+		g.setColor( new Color(255, 255, 255));
+		for(int x=0; x < entities.size(); x++) {
+			double dx = (entities.get(x).xPos * tileDrawSize) + camX;
+			double dy = (entities.get(x).yPos * tileDrawSize) + camY;
+			if(dx < 0 || dy < 0 || dx > Launcher.window.width || dy > Launcher.window.height)
+				continue;
+			
+			g.fillCenterCircle(dx, dy, 10);
+		}
+		
+		
+		g.drawOutlinedString( "X:"+mouseOnTileX + " Y:"+mouseOnTileY, 0, g.fontSize);
 	} // End of tar(Graphics g)
 }

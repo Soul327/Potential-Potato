@@ -27,13 +27,13 @@ public class Launcher implements SimpleWindowEvent {
 		window = new SimpleWindow();
 		// This add this instance of Launcher to the list, allowing for the window to respond to the tar(Graphics g) function
 		window.addSimpleWindowEvent(this);
-		window.start();
 		world = new World();
 		system = new SolarSystem();
+		window.start();
 	}
 	
 	// Stored number for the current state, some examples state are main menu, settings, game window, and map
-	int currentStateNumber = 1;
+	int currentStateNumber = 0;
 	
 	// tar(Graphics g) stands for tick and render
 	// This will render the graphics to the screen and handle all processing
