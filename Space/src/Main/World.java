@@ -11,12 +11,12 @@ import java.awt.event.KeyEvent;
 public class World {
 	double sx = 0, sy = 0;// Location is the system
 	double svx = 0, svy = 0; // Velocity in the system
-	int size = 100; // Size of the world, does not necessarily indicative the amount of tiles
+	int size = 10; // Size of the world, does not necessarily indicative the amount of tiles
 	double mass = size * 5000;
 	Color colorOfPlanetFromSpace = new Color(50,220,75);
 	
-	int camX = 0, camY = 0;
-	double tileDrawSize = 40;
+	double camX = 0, camY = 0;
+	double tileDrawSize = 80;
 	
 	Tile[][] tiles;
 	ArrayList<Entity> entities;
@@ -38,12 +38,13 @@ public class World {
 				tiles[x][y] = new Tile(x,y);
 		
 		entities = new ArrayList<Entity>();
-		for(int z=0;z<10;z++) {
-			Entity friend = new Slave();
-			friend.xPos = Math.random() * tiles.length;
-			friend.yPos = Math.random() * tiles[0].length;
-			entities.add(friend);
-		}
+		
+//		for(int z=0;z<10;z++) {
+//			Entity friend = new Slave();
+//			friend.xPos = Math.random() * tiles.length;
+//			friend.yPos = Math.random() * tiles[0].length;
+//			entities.add(friend);
+//		}
 	}
 	
 	// This tick will update everything on the word
@@ -108,12 +109,18 @@ public class World {
 	public void tar(Graphics g) {
 		mouseOnTileX = (MouseManager.mouseX-camX)/tileDrawSize;
 		mouseOnTileY = (MouseManager.mouseY-camY)/tileDrawSize;
+		if(mouseOnTileX < 0)
+			mouseOnTileX = tiles.length + mouseOnTileX;
+		if(mouseOnTileX > tiles.length)
+			mouseOnTileX -= tiles.length;
+		
 		// Controls
 		// getKey returns true only when pressed
-		if(KeyManager.getKey(KeyEvent.VK_W)) camY++;
-		if(KeyManager.getKey(KeyEvent.VK_S)) camY--;
-		if(KeyManager.getKey(KeyEvent.VK_A)) camX++;
-		if(KeyManager.getKey(KeyEvent.VK_D)) camX--;
+		double camMoveSpeed = tileDrawSize * .01;
+		if(KeyManager.getKey(KeyEvent.VK_W)) camY += camMoveSpeed;
+		if(KeyManager.getKey(KeyEvent.VK_S)) camY -= camMoveSpeed;
+		if(KeyManager.getKey(KeyEvent.VK_A)) camX += camMoveSpeed;
+		if(KeyManager.getKey(KeyEvent.VK_D)) camX -= camMoveSpeed;
 		
 		if(KeyManager.getKey(KeyEvent.VK_E)) tileDrawSize+= .1;
 		if(KeyManager.getKey(KeyEvent.VK_Q) && tileDrawSize > 5) tileDrawSize-= .1;
@@ -122,8 +129,32 @@ public class World {
 		//if(KeyManager.keyRelease(KeyEvent.VK_SPACE)) gameTick();
 		if(KeyManager.getKey(KeyEvent.VK_SPACE)) gameTick();
 		
+		tarTiles(g);
+		
+		// Rendering entities (Rayna)
+		g.setColor( new Color(255, 255, 255));
+		for(int x=0; x < entities.size(); x++) {
+			double dx = (entities.get(x).xPos * tileDrawSize) + camX;
+			double dy = (entities.get(x).yPos * tileDrawSize) + camY;
+			
+			// Checks if the entity is rendering on the screen, if it is not, continue
+			if(dx < -tileDrawSize || dy < -tileDrawSize || dx > g.width || dy > g.height)
+				continue;
+			
+			// Renders entity
+			g.fillCenterCircle(dx, dy, 10);
+		}
+		tarDebug(g);
+	} // End of tar(Graphics g)
+	
+	public void tarTiles(Graphics g) {
 		// Rendering tiles
-		g.setColor( new Color(55,55,55) ); // Set draw color to white
+		if(camX > g.width)
+			camX = -tiles.length*tileDrawSize + g.width;
+		if(camX < -(tiles.length * tileDrawSize) )
+			camX = 0;
+		
+		// Draw Primary
 		for(int x=0;x<tiles.length;x++)
 			for(int y=0;y<tiles[x].length;y++) {
 				// Create and set draw locations for later use
@@ -131,27 +162,49 @@ public class World {
 				double dy = y*tileDrawSize+camY;
 				
 				// Checks if the tile is rendering on the screen, if it is not, continue
-				if(dx < 0 || dy < 0 || dx > Launcher.window.width || dy > Launcher.window.height)
+				if(dx < -tileDrawSize || dy < -tileDrawSize || dx > g.width || dy > g.height)
 					continue;
 				
 				// Draw rectangle of the tile
 				g.drawRect(dx, dy, tileDrawSize, tileDrawSize);
 				// Draws the temp data on the tile
-//				g.drawOutlinedString( "" + (int)tiles[x][y].temp, dx+2, dy+g.fontSize);
+//					g.drawOutlinedString( "" + (int)tiles[x][y].temp, dx+2, dy+g.fontSize);
+				g.drawOutlinedString( "X:" + (int)tiles[x][y].x+" Y:" + (int)tiles[x][y].y, dx+2, dy+g.fontSize);
 			}
 		
-		// Rendering entities
-		g.setColor( new Color(255, 255, 255));
-		for(int x=0; x < entities.size(); x++) {
-			double dx = (entities.get(x).xPos * tileDrawSize) + camX;
-			double dy = (entities.get(x).yPos * tileDrawSize) + camY;
-			if(dx < 0 || dy < 0 || dx > Launcher.window.width || dy > Launcher.window.height)
-				continue;
-			
-			g.fillCenterCircle(dx, dy, 10);
+	// If camera can see to the left of the primary area, draw map again on the left
+		if(camX > 0) {
+			for(int x=(int)(tiles.length - g.width/tileDrawSize);x<tiles.length;x++)
+				for(int y=0;y<tiles[x].length;y++) {
+					g.setColor( new Color(255,0,0) );
+					// Create and set draw locations for later use
+					double dx = x*tileDrawSize+camX-tileDrawSize*tiles.length;
+					double dy = y*tileDrawSize+camY;
+					
+					g.drawRect(dx, dy, tileDrawSize, tileDrawSize);
+					g.drawOutlinedString( "X:" + (int)tiles[x][y].x+" Y:" + (int)tiles[x][y].y, dx+2, dy+g.fontSize);
+				}
 		}
 		
-		
-		g.drawOutlinedString( "X:"+mouseOnTileX + " Y:"+mouseOnTileY, 0, g.fontSize);
-	} // End of tar(Graphics g)
+	// If camera can see to the right of the primary area, draw map again on the right
+		if(camX < tiles.length * tileDrawSize) {
+			for(int x=0;x<g.width/tileDrawSize;x++)
+				for(int y=0;y<tiles[x].length;y++) {
+					g.setColor( new Color(0,0,255) );
+					// Create and set draw locations for later use
+					double dx = x*tileDrawSize+camX+tileDrawSize*tiles.length;
+					double dy = y*tileDrawSize+camY;
+					
+					g.drawRect(dx, dy, tileDrawSize, tileDrawSize);
+					g.drawOutlinedString( "X:" + (int)tiles[x][y].x+" Y:" + (int)tiles[x][y].y, dx+2, dy+g.fontSize);
+				}
+		}
+	}
+	
+	public void tarDebug(Graphics g) {
+		// Draw debug info
+		int debugInfoLine = 0;
+		g.drawOutlinedString( "X:"+mouseOnTileX + " Y:"+mouseOnTileY, 0, g.fontSize*++debugInfoLine);
+		g.drawOutlinedString( "CamX:"+camX+" CamY:"+camY, 0, g.fontSize*++debugInfoLine);
+	}
 }
