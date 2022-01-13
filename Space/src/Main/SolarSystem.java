@@ -9,26 +9,24 @@ import Misc.Mat;
 import Rendering.Graphics;
 
 public class SolarSystem {
-	static double G = 6.674 * Math.pow(10, -10); // Gravitational Constant
+	static final double G = 6.674 * Math.pow(10, -10); // Gravitational Constant
 	double zoom = 1;
 	ArrayList<World> worlds = new ArrayList<World>();
 	
+	
+	String name = "System";
+	static int sid = 0;
+	int id = 0;
+	
 	public SolarSystem() {
-		World world;
-		world = new World(0,0,0,0);
-		world.mass = 5.9722 * Math.pow(10, 24);
-		worlds.add( world );
+		id = sid++;
+		name += " "+id;
 		
-		//The moon
-		world = new World(0,384_400_000,1_022,0);
-		world.mass = 7.342 * Math.pow(10, 22);
-		world.colorOfPlanetFromSpace = new Color(150,150,150);
-//		world.mass /= 4;
-		worlds.add( world );
+		example();
 		
 		(new Thread() {
 			public void run() {
-				int maxFPS = 500_000;
+				int maxFPS = (60*60*12);
 				double timePerTick = 1000000000 / maxFPS, delta = 0;
 				long now, lastTime = System.nanoTime(), timer = 0;
 				while(true){
@@ -47,6 +45,53 @@ public class SolarSystem {
 			}
 		}).start();
 	}
+	
+	public void example() {
+		World world;
+		world = new World(0,0,0,0);
+		world.mass = 5.9722 * Math.pow(10, 24);
+		worlds.add( world );
+		
+		//The moon
+		world = new World(0,384_400_000,1_022,0);
+		world.mass = 7.342 * Math.pow(10, 22);
+		world.colorOfPlanetFromSpace = new Color(150,150,150);
+		worlds.add( world );
+		
+//		//The moon2
+//		world = new World(0,-384_400_000,-1_022,0);
+//		world.mass = 7.342 * Math.pow(10, 22);
+//		world.colorOfPlanetFromSpace = new Color(150,150,150);
+//		worlds.add( world );
+//		
+//		//The moon3
+//		world = new World(-384_400_000, 0, 0, 1_022);
+//		world.mass = 7.342 * Math.pow(10, 22);
+//		world.colorOfPlanetFromSpace = new Color(150,150,150);
+//		worlds.add( world );
+//		
+//		//The moon4
+//		world = new World(384_400_000, 0, 0, -1_022);
+//		world.mass = 7.342 * Math.pow(10, 22);
+//		world.colorOfPlanetFromSpace = new Color(150,150,150);
+//		worlds.add( world );
+	}
+	public void example2() {
+		World world;
+		int z = 1_022/8;
+		//The moon
+		world = new World(0,384_400_000,z,0);
+		world.mass = 7.342 * Math.pow(10, 22);
+		world.colorOfPlanetFromSpace = new Color(150,150,150);
+		worlds.add( world );
+		
+		//The moon2
+		world = new World(0,-384_400_000,-z,0);
+		world.mass = 7.342 * Math.pow(10, 22);
+		world.colorOfPlanetFromSpace = new Color(150,150,150);
+		worlds.add( world );
+	}
+	
 	public void gameTick() {
 		for(World world:worlds) {
 			for(World w2:worlds) {
@@ -57,17 +102,14 @@ public class SolarSystem {
 				double speed = force / world.mass;
 				world.svx -= speed * Math.cos( angle );
 				world.svy -= speed * Math.sin( angle );
-//				System.out.printf("VX:%3.1f  VY:%3.1f Angle:%f Distance:%f Force:%f%n", world.svx, world.svy, angle, distance, force);
 			}
 			
 			world.sx += world.svx;
 			world.sy += world.svy;
-//			System.out.printf("X:%f Y:%f%n",world.sx, world.sy);
-//			break;
 		}
 	}
 	public void tar(Graphics g) {
-		double zoomAmount = .1;
+		double zoomAmount = 1;
 		if(KeyManager.getKey(KeyEvent.VK_Q)) zoom += zoomAmount;
 		if(KeyManager.getKey(KeyEvent.VK_E) && zoom>1) zoom -= zoomAmount;
 		
@@ -76,12 +118,12 @@ public class SolarSystem {
 		
 		for(World world:worlds) {
 			g.setColor( world.colorOfPlanetFromSpace );
-			double ss = Math.pow(10, 6);
+			double ss = Math.pow(10, 6.5);
 //			double ss = Math.pow(10, 23);
 			double s = 10_000_000;
 			
-			double dx = world.sx/ss+Launcher.window.width/2;
-			double dy = world.sy/ss+Launcher.window.height/2;
+			double dx = world.sx/ss+g.width/2;
+			double dy = world.sy/ss+g.height/2;
 //			System.out.printf("X:%f Y:%f%n", dx, dy);
 			g.fillCenterCircle( dx, dy, 20);
 			g.setColor( new Color(255,0,0) );

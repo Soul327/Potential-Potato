@@ -18,6 +18,10 @@ public class World {
 	double camX = 0, camY = 0;
 	double tileDrawSize = 80;
 	
+	int id = 0;
+	static int sid = 0;
+	String name = "World";
+	
 	Tile[][] tiles;
 	ArrayList<Entity> entities;
 	
@@ -32,6 +36,7 @@ public class World {
 	}
 	
 	public void init() {
+		name += " " + (id = sid++);
 		tiles = new Tile[size*3][size];
 		for(int x=0;x<tiles.length;x++)
 			for(int y=0;y<tiles[x].length;y++)
