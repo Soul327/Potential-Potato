@@ -63,7 +63,7 @@ public class GameState {
 	}
 	
 	public void tar(Graphics g) {
-		systems.get(0).tar(g);
+		systems.get(0).worlds.get(0).tar(g);
 	}
 	
 }
