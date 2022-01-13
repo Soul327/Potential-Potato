@@ -44,13 +44,14 @@ public class World {
 		
 		entities = new ArrayList<Entity>();
 		
-//		for(int z=0;z<10;z++) {
-//			Entity friend = new Slave();
-//			friend.xPos = Math.random() * tiles.length;
-//			friend.yPos = Math.random() * tiles[0].length;
-//			entities.add(friend);
-//		}
+		for(int z=0;z<10;z++) {
+			Entity friend = new Slave(this);
+			friend.xPos = Math.random() * tiles.length;
+			friend.yPos = Math.random() * tiles[0].length;
+			entities.add(friend);
+		}
 	}
+	
 	
 	// This tick will update everything on the word
 	public void gameTick() {
@@ -108,7 +109,8 @@ public class World {
 		return null;
 	}
 
-	static double mouseOnTileX = 0, mouseOnTileY = 0;
+	static double mouseOnTileX = 0, mouseOnTileY = 0, cameraPos = 0;
+	static double tileMath = 0;
 
 	// tar, tick and render
 	public void tar(Graphics g) {
@@ -129,6 +131,7 @@ public class World {
 		
 		if(KeyManager.getKey(KeyEvent.VK_E)) tileDrawSize+= .1;
 		if(KeyManager.getKey(KeyEvent.VK_Q) && tileDrawSize > 5) tileDrawSize-= .1;
+		cameraPos = camX; // Added for Slave.java movement calculations (Rayna | 1/7/2021)
 		
 		// keyRelease return true only when the key is let go after being pressed, good for typing
 		//if(KeyManager.keyRelease(KeyEvent.VK_SPACE)) gameTick();
@@ -136,20 +139,12 @@ public class World {
 		
 		tarTiles(g);
 		
-		// Rendering entities (Rayna)
-		g.setColor( new Color(255, 255, 255));
-		for(int x=0; x < entities.size(); x++) {
-			double dx = (entities.get(x).xPos * tileDrawSize) + camX;
-			double dy = (entities.get(x).yPos * tileDrawSize) + camY;
+		tarEntity(g); // Added after moving this section of code to its own function (Rayna | 1/7/2022)
 			
-			// Checks if the entity is rendering on the screen, if it is not, continue
-			if(dx < -tileDrawSize || dy < -tileDrawSize || dx > g.width || dy > g.height)
-				continue;
-			
-			// Renders entity
-			g.fillCenterCircle(dx, dy, 10);
-		}
 		tarDebug(g);
+		
+		tileMath = tiles.length * tileDrawSize;
+		
 	} // End of tar(Graphics g)
 	
 	public void tarTiles(Graphics g) {
@@ -204,6 +199,42 @@ public class World {
 					g.drawOutlinedString( "X:" + (int)tiles[x][y].x+" Y:" + (int)tiles[x][y].y, dx+2, dy+g.fontSize);
 				}
 		}
+	}
+	
+	// Renders entities
+	// Moved from the tar(Graphics g) function (Rayna | 1/7/2022)
+	public void tarEntity(Graphics g) {
+		g.setColor( new Color(255, 255, 255));
+		for(int x=0; x < entities.size(); x++) {
+			double dx = (entities.get(x).xPos * tileDrawSize) + camX;
+			double dy = (entities.get(x).yPos * tileDrawSize) + camY;
+			
+			// Checks if the entity is rendering on the screen, if it is not, continue
+			if(dx < -tileDrawSize || dy < -tileDrawSize || dx > g.width || dy > g.height)
+				continue;
+			
+			// Renders entity
+			g.fillCenterCircle(dx, dy, 10);
+		}
+		
+		if (camX > 0) {
+			for (int x=0; x<entities.size(); x++) {
+				double dx = (entities.get(x).xPos * tileDrawSize) + camX - (tileDrawSize*tiles.length);
+				double dy = (entities.get(x).yPos * tileDrawSize) + camY;
+				
+				g.fillCenterCircle(dx, dy, 10);
+			}
+		}
+		
+		if(camX < tiles.length * tileDrawSize) {
+			for (int x=0; x<entities.size(); x++) {
+				double dx = (entities.get(x).xPos * tileDrawSize) + camX + (tileDrawSize*tiles.length);
+				double dy = (entities.get(x).yPos * tileDrawSize) + camY;
+				
+				g.fillCenterCircle(dx, dy, 10);
+			}
+		}
+		tarDebug(g);
 	}
 	
 	public void tarDebug(Graphics g) {
